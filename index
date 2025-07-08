@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buffet Calculator PRO - Sistema de Cálculo para Eventos</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍽️</text></svg>">
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #f5f5f5;
+            --text-color: #333333;
+            --light-text: #666666;
+            --border-color: #dddddd;
+        }
+        
+        body {
+            font-family: 'Helvetica', Arial, sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 0;
+            background: linear-gradient(90deg, #FF4D4D, #4a6fa5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            letter-spacing: 1px;
+        }
+        
+        .copyright {
+            font-size: 12px;
+            color: var(--light-text);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .panel {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .panel-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .checkbox-group {
+            margin-bottom: 10px;
+        }
+        
+        .checkbox-group label {
+            display: inline-block;
+            margin-left: 5px;
+            font-weight: normal;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 10px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #3a5a8f;
+        }
+        
+        .results {
+            grid-column: span 2;
+            min-height: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+        }
+        
+        .child-fields {
+            display: none;
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+        
+        .child-fields.show {
+            display: block;
+        }
+        
+        .child-inputs {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .child-inputs div {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .child-inputs input {
+            width: 60px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .results {
+                grid-column: span 1;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .results, .results * {
+                visibility: visible;
+            }
+            .results {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: auto;
+                border: none;
+                background: white;
+                font-size: 12pt;
+                padding: 20px;
+                margin: 0;
+                overflow: visible;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Buffet Calculator PRO</h1>
+            <div class="copyright">© 2025 Eventos PRO - Todos os direitos reservados - Versão 2.0</div>
+        </div>
+        
+        <div class="main-content">
+            <div class="panel">
+                <div class="panel-title">Dados do Evento</div>
+                
+                <div class="form-group">
+                    <label for="client-name">Nome do Cliente:</label>
+                    <input type="text" id="client-name" placeholder="Digite o nome do cliente">
+                </div>
+                
+                <div class="form-group">
+                    <label for="event-date">Data do Evento:</label>
+                    <input type="text" id="event-date" placeholder="DD/MM/AAAA">
+                </div>
+                
+                <div class="form-group">
+                    <label for="event-type">Tipo de Evento:</label>
+                    <select id="event-type">
+                        <option value="">Selecione...</option>
+                        <option value="Aniversário">Aniversário</option>
+                        <option value="Casamento">Casamento</option>
+                        <option value="Corporativo">Corporativo</option>
+                        <option value="Formatura">Formatura</option>
+                        <option value="Confraternização">Confraternização</option>
+                        <option value="Outros">Outros</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="event-option">Opção de Evento:</label>
+                    <select id="event-option">
+                        <option value="">Selecione...</option>
+                        <option value="Coquetel">Coquetel</option>
+                        <option value="Almoço">Almoço</option>
+                        <option value="Jantar">Jantar</option>
+                        <option value="Churrasco">Churrasco</option>
+                        <option value="Feijoada">Feijoada</option>
+                        <option value="Festa Infantil">Festa Infantil</option>
+                        <option value="Café da Manhã">Café da Manhã</option>
+                        <option value="Coffee Break">Coffee Break</option>
+                        <option value="Brunch">Brunch</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="guests">Número de Convidados:</label>
+                    <input type="number" id="guests" value="100" min="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="event-hours">Duração (horas):</label>
+                    <select id="event-hours">
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                    </select>
+                </div>
+                
+                <div class="child-fields" id="child-fields">
+                    <div class="child-inputs">
+                        <div>
+                            <label for="adults">Adultos:</label>
+                            <input type="number" id="adults" value="0" min="0">
+                        </div>
+                        <div>
+                            <label for="children">Crianças (3-12 anos):</label>
+                            <input type="number" id="children" value="0" min="0">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button id="calculate-btn">Calcular</button>
+                    <button id="print-btn">Imprimir Relatório</button>
+                    <button id="clear-btn">Limpar</button>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-title">Opções do Evento</div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="include-non-alcohol" checked>
+                    <label for="include-non-alcohol">Incluir Bebidas Não Alcoólicas</label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="include-alcohol">
+                    <label for="include-alcohol">Incluir Bebidas Alcoólicas</label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="include-utensils" checked>
+                    <label for="include-utensils">Incluir Utensílios (copos, pratos, talheres)</label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="include-furniture">
+                    <label for="include-furniture">Incluir Mobiliário (mesas e cadeiras)</label>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-title">Resultados</div>
+                <div class="results" id="result-text"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dados dos eventos
+        const eventData = {
+            "Coquetel": {
+                "Simples": {"Mini Salgados": 15},
+                "+ 1 Prato quente": {"Mini Salgados": 12},
+                "Seguido de Almoço/Jantar": {"Mini Salgados": 8}
+            },
+            "Almoço": {
+                "Arroz (cru)": 0.05,
+                "Frutas e Vegetais": 0.12,
+                "Carne": 0.15,  // Corrigido de 0.15 para 0.25
+                "Peixe": 0.15,    // Corrigido de 0.15 para 0.25
+                "Massa (Prato Principal)": 0.1,
+                "Massa (Acompanhamento)": 0.08
+            },
+            "Jantar": {
+                "Arroz (cru)": 0.05,
+                "Frutas e Vegetais": 0.12,
+                "Carne": 0.15,    // Corrigido de 0.15 para 0.25
+                "Peixe": 0.15,    // Corrigido de 0.15 para 0.25
+                "Massa (Prato Principal)": 0.1,
+                "Massa (Acompanhamento)": 0.08
+            },
+            "Churrasco": {
+                "Arroz (cru)": 0.05,
+                "Frutas e Vegetais": 0.12,
+                "Carnes e Peixe": 0.3,
+                "Mini Pães": 0.03,
+                "Vinagrete": 0.05,
+                "Maionese/Salpicão": 0.05
+            },
+            "Feijoada": {
+                "Feijão Preto": 0.08,
+                "Arroz": 0.06,
+                "Couve": 0.02,
+                "Farofa": 0.04,
+                "Vinagrete": 0.03,
+                "Laranja": 0.5,
+                "Carne Sem Osso": 0.1,
+                "Carne Com Osso": 0.15
+            },
+            "Sobremesas": {
+                "Doces": {"quantidade": 4, "unidade": "Unidades"},
+                "Bolo": {"quantidade": 0.08, "unidade": "Kg"},
+                "Sorvete": {"quantidade": 0.12, "unidade": "Kg"},
+                "Torta": {"quantidade": 1, "unidade": "Kg/10p"}
+            },
+            "Bebidas Não Alcoólicas": {
+                "Água Mineral": 0.4,
+                "Suco": 0.25,
+                "Refrigerante": 0.8,
+                "Café": 0.05
+            },
+            "Bebidas Alcoólicas": {
+                "Cerveja": 0.75,
+                "Coquetel de Frutas/Batidas": 0.06,
+                "Vinho": 0.2
+            },
+            "Festa Infantil": {
+                "Sucos/Refrigerantes (Adultos)": 0.6,
+                "Sucos/Refrigerantes (Crianças)": 0.3,
+                "Café (Adultos)": 0.05,
+                "Saladas (Adultos)": 0.045,
+                "Saladas (Crianças)": 0.015,
+                "Mini Sanduíches (Adultos)": 4,
+                "Mini Sanduíches (Crianças)": 2,
+                "Salgadinhos (Adultos)": 7,  // Corrigido de 7 para adultos
+                "Salgadinhos (Crianças)": 3,  // Corrigido de 3 para crianças
+                "Frutas (Adultos)": 0.05,
+                "Frutas (Crianças)": 0.05,
+                "Bolo (Adultos)": 0.1,
+                "Bolo (Crianças)": 0.05,
+                "Docinho (Adultos)": 5,
+                "Docinho (Crianças)": 2,
+                "Pipoca (Adultos)": 0.02,
+                "Pipoca (Crianças)": 0.01
+            },
+            "Café da Manhã": {
+                "Água Mineral": {"quantidade": 0.25, "unidade": "Litros"},
+                "Café": {"quantidade": 0.07, "unidade": "Litros"},
+                "Leite": {"quantidade": 0.05, "unidade": "Litros"},
+                "Chá": {"quantidade": 0.05, "unidade": "Litros"},
+                "Suco": {"quantidade": 0.15, "unidade": "Litros"},
+                "Iogurte": {"quantidade": 0.07, "unidade": "Kg"},
+                "Cereais": {"quantidade": 0.02, "unidade": "Kg"},
+                "Salada de Frutas": {"quantidade": 0.05, "unidade": "Kg"},
+                "Mini Pães": {"quantidade": 2, "unidade": "Unidades"},
+                "Geléia/Pastas": {"quantidade": 0.01, "unidade": "Kg"},
+                "Frios": {"quantidade": 0.03, "unidade": "Kg"},
+                "Ovos Mexidos": {"quantidade": 1, "unidade": "Unidades"},
+                "Pão de Queijo": {"quantidade": 3, "unidade": "Unidades"},
+                "Mini Salgados Assados": {"quantidade": 2, "unidade": "Unidades"},
+                "Bolo Doce/Mini Cupcake": {"quantidade": 2, "unidade": "Unidades"}
+            },
+            "Coffee Break": {
+                "Água Mineral": {"quantidade": 0.25, "unidade": "Litros"},
+                "Café": {"quantidade": 0.07, "unidade": "Litros"},
+                "Leite": {"quantidade": 0.05, "unidade": "Litros"},
+                "Chá": {"quantidade": 0.05, "unidade": "Litros"},
+                "Suco": {"quantidade": 0.15, "unidade": "Litros"},
+                "Mini Sanduíches": {"quantidade": 2.5, "unidade": "Unidades"},
+                "Mini Salgados": {"quantidade": 2, "unidade": "Unidades"},
+                "Bolo Doce/Mini Cupcake": {"quantidade": 1, "unidade": "Unidades"},
+                "Mini Tortinha/Docinho": {"quantidade": 2, "unidade": "Unidades"}
+            },
+            "Brunch": {
+                "Água Mineral": {"quantidade": 0.25, "unidade": "Litros"},
+                "Suco": {"quantidade": 0.4, "unidade": "Litros"},
+                "Mini Pães": {"quantidade": 2, "unidade": "Unidades"},
+                "Pastas (2-3 Tipos)": {"quantidade": 0.01, "unidade": "Kg"},
+                "Salada de Folhas Verdes": {"quantidade": 0.045, "unidade": "Kg"},
+                "Tábua de Frios": {"quantidade": 0.03, "unidade": "Kg"},
+                "Tortas Salgadas": {"quantidade": 0.15, "unidade": "Kg"},
+                "Tortas Doces": {"quantidade": 0.1, "unidade": "Kg"}
+            },
+            "Utensílios": {
+                "Copos de Vidro": 2,
+                "Copos Descartáveis": 5,
+                "Taças": 1,
+                "Xícaras (à la carte)": 1,
+                "Xícaras (buffet)": 0.5,
+                "Copos de Isopor": 2,
+                "Pratos (Principal)": 1,
+                "Pratos (Sobremesa)": 1,
+                "Colheres": 1,
+                "Colheres (Sobremesa)": 1,
+                "Garfos": 1,
+                "Garfos (Sobremesa)": 1,
+                "Facas": 1
+            },
+            "Mobiliário": {
+                "Cadeiras": 1,
+                "Mesas (4 lugares)": 0.25,
+                "Mesas (6 lugares)": 0.1667,
+                "Mesas (8 lugares)": 0.125,
+                "Mesas (10 lugares)": 0.1,
+                "Pranchão": 0.025
+            }
+        };
+
+        // Elementos DOM
+        const clientNameInput = document.getElementById('client-name');
+        const eventDateInput = document.getElementById('event-date');
+        const eventTypeSelect = document.getElementById('event-type');
+        const eventOptionSelect = document.getElementById('event-option');
+        const guestsInput = document.getElementById('guests');
+        const eventHoursSelect = document.getElementById('event-hours');
+        const adultsInput = document.getElementById('adults');
+        const childrenInput = document.getElementById('children');
+        const childFieldsDiv = document.getElementById('child-fields');
+        const includeNonAlcoholCheckbox = document.getElementById('include-non-alcohol');
+        const includeAlcoholCheckbox = document.getElementById('include-alcohol');
+        const includeUtensilsCheckbox = document.getElementById('include-utensils');
+        const includeFurnitureCheckbox = document.getElementById('include-furniture');
+        const resultTextDiv = document.getElementById('result-text');
+        const calculateBtn = document.getElementById('calculate-btn');
+        const printBtn = document.getElementById('print-btn');
+        const clearBtn = document.getElementById('clear-btn');
+
+        // Event Listeners
+        eventOptionSelect.addEventListener('change', updateChildFields);
+        calculateBtn.addEventListener('click', calculate);
+        printBtn.addEventListener('click', printReport);
+        clearBtn.addEventListener('click', clearFields);
+
+        // Função para mostrar/ocultar campos de crianças
+        function updateChildFields() {
+            if (eventOptionSelect.value === 'Festa Infantil') {
+                childFieldsDiv.classList.add('show');
+            } else {
+                childFieldsDiv.classList.remove('show');
+            }
+        }
+
+        // Função principal de cálculo
+        function calculate() {
+            try {
+                // Validação dos campos obrigatórios
+                if (!clientNameInput.value || !eventDateInput.value || !eventTypeSelect.value || !eventOptionSelect.value) {
+                    alert("Por favor, preencha todos os campos obrigatórios.");
+                    return;
+                }
+
+                let totalGuests;
+                if (eventOptionSelect.value === 'Festa Infantil') {
+                    const adults = parseInt(adultsInput.value) || 0;
+                    const children = parseInt(childrenInput.value) || 0;
+                    
+                    if (adults < 0 || children < 0) {
+                        alert("Para Festa Infantil, preencha valores válidos para adultos e crianças.");
+                        return;
+                    }
+                    
+                    totalGuests = adults + children;
+                    guestsInput.value = totalGuests;
+                } else {
+                    totalGuests = parseInt(guestsInput.value) || 0;
+                    
+                    if (totalGuests <= 0) {
+                        alert("Por favor, informe um número válido de convidados.");
+                        return;
+                    }
+                }
+
+                const horasEvento = parseInt(eventHoursSelect.value);
+                
+                // Fatores de aumento (5h = +8%, 6h = +15%)
+                let foodFactor, beverageFactor;
+                if (horasEvento === 5) {
+                    foodFactor = 1.08;
+                    beverageFactor = 1.08;
+                } else if (horasEvento === 6) {
+                    foodFactor = 1.15;
+                    beverageFactor = 1.15;
+                } else {
+                    foodFactor = 1.0;
+                    beverageFactor = 1.0;
+                }
+
+                // Limpar resultados anteriores
+                resultTextDiv.innerHTML = '';
+
+                // Cabeçalho
+                addResultLine('='.repeat(70));
+                addResultLine('ORÇAMENTO PARA EVENTO - BUFFET CALCULATOR PRO'.padStart(55));
+                addResultLine('='.repeat(70));
+                addResultLine('');
+
+                addResultLine(`Cliente:`.padEnd(20) + clientNameInput.value);
+                addResultLine(`Data do Evento:`.padEnd(20) + eventDateInput.value);
+                addResultLine(`Tipo de Evento:`.padEnd(20) + eventTypeSelect.value);
+                addResultLine(`Opção de Evento:`.padEnd(20) + eventOptionSelect.value);
+                addResultLine(`Total Convidados:`.padEnd(20) + totalGuests);
+                
+                if (eventOptionSelect.value === 'Festa Infantil') {
+                    addResultLine(`Adultos:`.padEnd(20) + adultsInput.value);
+                    addResultLine(`Crianças:`.padEnd(20) + childrenInput.value);
+                }
+                
+                addResultLine(`Duração:`.padEnd(20) + `${horasEvento} horas`);
+                addResultLine('');
+                addResultLine('='.repeat(70));
+                addResultLine('ITENS NECESSÁRIOS'.padStart(55));
+                addResultLine('='.repeat(70));
+                addResultLine('');
+
+                // Calcular itens principais
+                const option = eventOptionSelect.value;
+                if (option in eventData) {
+                    addResultLine(`\n${option.toUpperCase()}`);
+                    addResultLine('-'.repeat(70));
+                    
+                    if (option === 'Festa Infantil') {
+                        calculateChildParty(totalGuests, foodFactor);
+                    } else if (option === 'Coquetel') {
+                        calculateCoquetel(totalGuests, foodFactor);
+                    } else {
+                        calculateStandardEvent(option, totalGuests, foodFactor);
+                    }
+                }
+
+                // Bebidas
+                if (includeNonAlcoholCheckbox.checked) {
+                    addResultLine('\nBEBIDAS NÃO ALCOÓLICAS');
+                    addResultLine('-'.repeat(70));
+                    calculateBeverages('Bebidas Não Alcoólicas', totalGuests, beverageFactor);
+                }
+                
+                if (includeAlcoholCheckbox.checked) {
+                    addResultLine('\nBEBIDAS ALCOÓLICAS');
+                    addResultLine('-'.repeat(70));
+                    calculateBeverages('Bebidas Alcoólicas', totalGuests, beverageFactor);
+                }
+
+                // Utensílios
+                if (includeUtensilsCheckbox.checked) {
+                    addResultLine('\nUTENSÍLIOS');
+                    addResultLine('-'.repeat(70));
+                    calculateUtensils(totalGuests);
+                }
+
+                // Mobiliário
+                if (includeFurnitureCheckbox.checked) {
+                    addResultLine('\nMOBILIÁRIO');
+                    addResultLine('-'.repeat(70));
+                    calculateFurniture(totalGuests);
+                }
+
+                // Pessoal
+                addResultLine('\nPESSOAL NECESSÁRIO');
+                addResultLine('-'.repeat(70));
+                calculateStaff(totalGuests);
+
+                alert("Cálculos concluídos com sucesso!");
+                
+            } catch (error) {
+                alert(`Ocorreu um erro: ${error.message}`);
+            }
+        }
+
+        // Funções auxiliares para cálculo
+        function calculateStandardEvent(eventType, guests, factor) {
+            const data = eventData[eventType];
+            
+            for (const [item, value] of Object.entries(data)) {
+                if (typeof value === 'object' && value !== null && 'quantidade' in value) {
+                    const quant = value.quantidade;
+                    const unit = value.unidade;
+                    const total = quant * guests * factor;
+                    addResultLine(`- ${item}: ${quant} ${unit}/pessoa → Total: ${total.toFixed(2)} ${unit}`);
+                } else if (typeof value === 'object' && value !== null) {
+                    // Para compatibilidade com outros itens que usam o formato antigo
+                    const quant = value.quantidade;
+                    const unit = value.unidade;
+                    const total = quant * guests;
+                    addResultLine(`- ${item}: ${quant} ${unit}/pessoa → Total: ${total.toFixed(2)} ${unit}`);
+                } else {
+                    if (item.toLowerCase().includes('ou')) {
+                        addResultLine(`- ${item}`);
+                    } else {
+                        const quant = value;
+                        const total = quant * guests * factor;
+                        const unit = quant < 1 ? "Kg" : "Unidades";
+                        addResultLine(`- ${item}: ${quant} ${unit}/pessoa → Total: ${total.toFixed(2)} ${unit}`);
+                    }
+                }
+            }
+        }
+
+        function calculateChildParty(totalGuests, factor) {
+            const adults = parseInt(adultsInput.value) || 0;
+            const children = parseInt(childrenInput.value) || 0;
+            
+            const data = eventData['Festa Infantil'];
+            
+            const items = {
+                "Bebidas": ["Sucos/Refrigerantes (Adultos)", "Sucos/Refrigerantes (Crianças)", "Café (Adultos)"],
+                "Salgados": ["Mini Sanduíches (Adultos)", "Mini Sanduíches (Crianças)", "Salgadinhos (Adultos)", "Salgadinhos (Crianças)"],
+                "Outros": ["Saladas (Adultos)", "Saladas (Crianças)", "Frutas (Adultos)", "Frutas (Crianças)", 
+                          "Bolo (Adultos)", "Bolo (Crianças)", "Docinho (Adultos)", "Docinho (Crianças)", 
+                          "Pipoca (Adultos)", "Pipoca (Crianças)"]
+            };
+            
+            for (const [category, itemList] of Object.entries(items)) {
+                addResultLine(`\n${category.toUpperCase()}:`);
+                for (const item of itemList) {
+                    const quant = data[item];
+                    let total;
+                    if (item.includes("(Adultos)")) {
+                        total = quant * adults * factor;
+                    } else {
+                        total = quant * children * factor;
+                    }
+                    
+                    let unit;
+                    if (item.toLowerCase().includes('suco') || item.toLowerCase().includes('refrigerante') || item.toLowerCase().includes('café')) {
+                        unit = "Litros";
+                    } else if (item.toLowerCase().includes('sanduíches') || item.toLowerCase().includes('salgadinhos') || item.toLowerCase().includes('docinho')) {
+                        unit = "Unidades";
+                    } else {
+                        unit = "Kg";
+                    }
+                    
+                    const displayItem = item.replace("(Adultos)", "").replace("(Crianças)", "").trim();
+                    addResultLine(`- ${displayItem}: ${quant} ${unit}/pessoa → Total: ${total.toFixed(2)} ${unit}`);
+                }
+            }
+        }
+
+        function calculateCoquetel(guests, factor) {
+            const option = eventOptionSelect.value;
+            
+            addResultLine("Escolha uma das opções de coquetel:");
+            
+            for (const [coqType, items] of Object.entries(eventData[option])) {
+                addResultLine(`\n${coqType}:`);
+                for (const [item, quant] of Object.entries(items)) {
+                    const total = quant * guests * factor;
+                    addResultLine(`- ${item}: ${quant} Unidades/pessoa → Total: ${total.toFixed(0)} Unidades`);
+                }
+            }
+        }
+
+        function calculateBeverages(beverageType, guests, factor) {
+            const data = eventData[beverageType];
+            
+            for (const [item, quant] of Object.entries(data)) {
+                const total = quant * guests * factor;
+                // Todas as bebidas agora em litros
+                addResultLine(`- ${item}: ${quant} Litros/pessoa → Total: ${total.toFixed(2)} Litros`);
+            }
+        }
+
+        function calculateUtensils(guests) {
+            const data = eventData['Utensílios'];
+            
+            for (const [item, quant] of Object.entries(data)) {
+                let total = quant * guests;
+                const unit = "Unidades";
+                if (item.includes("Xícaras (buffet)")) {
+                    total = total / 2;
+                }
+                addResultLine(`- ${item}: ${quant} ${unit}/pessoa → Total: ${total.toFixed(0)} ${unit}`);
+            }
+        }
+
+        function calculateFurniture(guests) {
+            const data = eventData['Mobiliário'];
+            
+            for (const [item, quant] of Object.entries(data)) {
+                let total = quant * guests;
+                if (item.includes("Mesas") || item.includes("Pranchão")) {
+                    total = Math.ceil(total);
+                }
+                addResultLine(`- ${item}: ${quant} Unidades/pessoa → Total: ${total.toFixed(0)} Unidades`);
+            }
+        }
+
+        function calculateStaff(guests) {
+            const waiters = Math.ceil(guests / 20);
+            addResultLine(`- Garçons: 1 para cada 20 convidados → Total: ${waiters}`);
+            
+            const cooks = Math.ceil(guests / 50);
+            addResultLine(`- Cozinheiros: 1 para cada 50 convidados → Total: ${cooks}`);
+        }
+
+        // Função para imprimir relatório
+        function printReport() {
+            if (!resultTextDiv.textContent.trim()) {
+                alert("Nenhum resultado para imprimir. Execute os cálculos primeiro.");
+                return;
+            }
+            window.print();
+        }
+
+        // Função para adicionar linha ao resultado
+        function addResultLine(text) {
+            resultTextDiv.innerHTML += text + '\n';
+        }
+
+        // Função para limpar campos
+        function clearFields() {
+            clientNameInput.value = '';
+            eventDateInput.value = '';
+            eventTypeSelect.value = '';
+            eventOptionSelect.value = '';
+            guestsInput.value = '100';
+            eventHoursSelect.value = '4';
+            adultsInput.value = '0';
+            childrenInput.value = '0';
+            includeNonAlcoholCheckbox.checked = true;
+            includeAlcoholCheckbox.checked = false;
+            includeUtensilsCheckbox.checked = true;
+            includeFurnitureCheckbox.checked = false;
+            resultTextDiv.innerHTML = '';
+            childFieldsDiv.classList.remove('show');
+        }
+    </script>
+</body>
+</html>
